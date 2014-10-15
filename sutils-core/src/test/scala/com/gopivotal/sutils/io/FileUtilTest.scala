@@ -93,7 +93,7 @@ class FileUtilTest extends BaseTest {
         |Warning:scalac: com.gopivotal.sutils.Serialize[java.io.Serializable,java.io.Serializable] <: com.gopivotal.sutils.Serialize[com.gopivotal.sutils.DeserializeTest.PuppetCommand,com.gopivotal.sutils.Format.StringYAML]?
         |Warning:scalac: com.gopivotal.sutils.Serialize[java.io.Serializable,java.io.Serializable] <: com.gopivotal.sutils.Serialize[com.gopivotal.sutils.DeserializeTest.PuppetCommand,com.gopivotal.sutils.Format.BytesYAML]?
         |Warning:scalac: com.gopivotal.sutils.Serialize[Object,Object] <: com.gopivotal.sutils.Serialize[List[com.gopivotal.sutils.DeserializeTest.Command],com.gopivotal.sutils.Format.StringYAML]?
-      """.serialize[ByteBuffer])
+      """.serialize[Array[Byte]])
 
     src.transferTo(dest) match {
       case -\/(t) => fail(t)
