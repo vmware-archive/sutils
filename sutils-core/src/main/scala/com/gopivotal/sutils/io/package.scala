@@ -24,9 +24,6 @@ package object io extends IOFunctions {
     def /[A: Show](child: A): File =
       new File(value, Show[A].shows(child))
 
-    def /(child: Any): File =
-      new File(value, child.toString)
-
     def listChildren(): Option[Seq[File]] =
       Option(value.listFiles()).map(Seq(_: _*))
 
