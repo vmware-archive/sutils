@@ -6,6 +6,8 @@ trait Syntaxes {
 
   object deserialize extends ToDeserializeOps
 
+  object serde extends ToSerializeOps with ToDeserializeOps
+
   object validate extends ToValidateOpt
 
   object all extends ToTypeClassOps
