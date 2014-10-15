@@ -17,8 +17,6 @@
  */
 package com.gopivotal
 
-import scala.annotation.tailrec
-
 package object sutils {
 
   /**
