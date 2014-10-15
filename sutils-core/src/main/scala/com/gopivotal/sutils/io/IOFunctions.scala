@@ -2,7 +2,7 @@ package com.gopivotal.sutils.io
 
 import java.io.Closeable
 
-trait IOFunctions {
+trait IOFunctions { self =>
   def close[A <: Closeable, B](a: => A)(fn: A => B): B = {
     lazy val alocal = a
     try {

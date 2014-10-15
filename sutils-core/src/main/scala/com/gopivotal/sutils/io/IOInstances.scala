@@ -7,7 +7,7 @@ import java.nio.file.Files
 
 import scalaz.Equal
 
-trait IOInstances {
+trait IOInstances { self =>
   private[io] val BufferSize = 4096
 
   implicit val ByteBufferEqual: Equal[ByteBuffer] =
