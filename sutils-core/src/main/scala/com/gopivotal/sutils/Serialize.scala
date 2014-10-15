@@ -86,7 +86,7 @@ trait SerializeFunctions { self =>
       override def serialize(a: A): Try[B] = Try(ser.serialize(a))
     }
 
-  implicit def stringSer(implicit c: Charset): Serialize[String, Array[Byte]] =
+  implicit def stringSer(implicit c: Charset = Charset.forName("UTF-8")): Serialize[String, Array[Byte]] =
     Serialize.serialize(_.getBytes(c))
 
   implicit def byteSerializerToByteBuffer[A](implicit as: Serialize[A, Array[Byte]]): Serialize[A, ByteBuffer] =

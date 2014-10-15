@@ -46,4 +46,15 @@ package object sutils {
     val x = fn()
     if (p(x)) doWhile(fn)(p) else x
   }
+
+  /**
+   * Runs a function until a given precondition is met.
+   *
+   * @return last value that the precondition approved
+   */
+  @tailrec
+  def doWhileMap[A, B](fn: () => A)(p: A => Boolean)(work: A => B): B = {
+    val x = fn()
+    if (p(x)) doWhileMap(fn)(p)(work) else work(x)
+  }
 }
