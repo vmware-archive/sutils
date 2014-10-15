@@ -1,6 +1,6 @@
 package com.gopivotal.sutils
 
-import java.io.File
+import java.io.{FileOutputStream, File}
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 import java.nio.file.{Files, StandardOpenOption}
@@ -29,6 +29,15 @@ package object io extends IOFunctions {
 
     def readFully(): Throwable \/ Array[Byte] =
       fromTryCatchNonFatal(Files.readAllBytes(value.toPath))
+
+    def write(data: Array[Byte]): Throwable \/ Unit =
+      fromTryCatchNonFatal {
+        value.getParentFile.mkdirs() // in case this doesn't already exist
+        close(new FileOutputStream(value)) { os =>
+          os.write(data)
+          os.flush()
+        }
+      }
 
     def write(data: ByteBuffer): Throwable \/ Unit =
       fromTryCatchNonFatal {
