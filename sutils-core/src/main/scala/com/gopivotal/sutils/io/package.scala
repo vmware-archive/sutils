@@ -45,13 +45,7 @@ package object io extends IOFunctions with IOInstances {
       fromTryCatchNonFatal(Files.readAllBytes(value.toPath))
 
     def write(data: Array[Byte]): Throwable \/ Unit =
-      fromTryCatchNonFatal {
-        value.getParentFile.mkdirs() // in case this doesn't already exist
-        close(new FileOutputStream(value)) { os =>
-          os.write(data)
-          os.flush()
-        }
-      }
+      value.write(data, 0, data.length)
 
     def write(data: Array[Byte], offset: Int, length: Int): Throwable \/ Unit =
       fromTryCatchNonFatal {

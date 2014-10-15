@@ -36,7 +36,21 @@ trait Serialize[A, B] {self =>
 /**
  * Lazy version of Serialize.  This is mainly used as a way to imperatively serialize to external types; most common
  * usage is to stream serialized results to disk.
+ *{{{
+ *   import java.io.File
+ *   import com.gopivotal.sutils.SerializeTo
+ *   import com.gopivotal.sutils.syntax.serialize._
+ *   import com.gopivotal.sutils.JacksonSerialize._
+ *   import com.gopivotal.sutils.Format
+ *   case class Person(name: String, age: Int)
+ *   val person = Person("Bob", 27)
+ *   person.serialize[SerializeTo[File, Format.YAML]] to new File("/tmp/person")
  *
+ *   $ cat /tmp/person
+ *   ---
+ *   name: "Bob"
+ *   age: 27
+ *}}}
  * @tparam C to serialize to
  * @tparam D data format
  */
