@@ -20,7 +20,8 @@ package com.gopivotal.sutils
 import java.nio.ByteBuffer
 
 import scala.util.Try
-import scalaz.Validation
+import scala.util.control.NonFatal
+import scalaz.{\/-, -\/, \/, Validation}
 
 /**
  * Serialize typeclass is for converting one type into another.  The main conversions are into data types such as
@@ -37,14 +38,14 @@ trait Serialize[A, B] {self =>
  * Lazy version of Serialize.  This is mainly used as a way to imperatively serialize to external types; most common
  * usage is to stream serialized results to disk.
  *{{{
- *   import java.io.File
- *   import com.gopivotal.sutils.SerializeTo
- *   import com.gopivotal.sutils.syntax.serialize._
- *   import com.gopivotal.sutils.JacksonSerialize._
- *   import com.gopivotal.sutils.Format
- *   case class Person(name: String, age: Int)
- *   val person = Person("Bob", 27)
- *   person.serialize[SerializeTo[File, Format.YAML]] to new File("/tmp/person")
+ *   scala> import java.io.File
+ *   scala> import com.gopivotal.sutils.SerializeTo
+ *   scala> import com.gopivotal.sutils.syntax.serialize._
+ *   scala> import com.gopivotal.sutils.JacksonSerialize._
+ *   scala> import com.gopivotal.sutils.Format
+ *   scala> case class Person(name: String, age: Int)
+ *   scala> val person = Person("Bob", 27)
+ *   scala> person.serialize[SerializeTo[File, Format.YAML]] to new File("/tmp/person")
  *
  *   $ cat /tmp/person
  *   ---
@@ -74,6 +75,19 @@ trait SerializeFunctions {self =>
   implicit def trySerialize[A, B](implicit ser: Serialize[A, B]): Serialize[A, Try[B]] =
     new Serialize[A, Try[B]] {
       override def serialize(a: A): Try[B] = Try(ser.serialize(a))
+    }
+
+  /**
+   * Serializer that uses either to denote failure or success.  Only [[NonFatal]] exceptions are returned.
+   */
+  implicit def scalazEitherSerialize[A, B](implicit ser: Serialize[A, B]): Serialize[A, Throwable \/ B] =
+    new Serialize[A, Throwable \/ B] {
+      override def serialize(a: A): Throwable \/ B =
+        try {
+          \/-(ser.serialize(a))
+        } catch {
+          case NonFatal(t) => -\/(t)
+        }
     }
 
   implicit def byteSerializerToByteBuffer[A](implicit as: Serialize[A, Array[Byte]]): Serialize[A, ByteBuffer] =

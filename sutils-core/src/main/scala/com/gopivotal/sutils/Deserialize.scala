@@ -18,7 +18,8 @@
 package com.gopivotal.sutils
 
 import scala.util.Try
-import scalaz.Validation
+import scala.util.control.NonFatal
+import scalaz.{\/-, -\/, \/, Validation}
 
 /**
  * Deserialize typeclass is for converting one type into another.  The main conversions are from data types such as
@@ -34,7 +35,7 @@ trait Deserialize[A, B] {self =>
 trait DeserializeFunctions { self =>
 
   /**
-   * Converts A into a validation of B.  If any exception are thrown, then Failure(e) is returned
+   * Converts A into a validation of B.  If any exception are thrown, then Failure(e) is returned.
    */
   implicit def validateDeserialize[A, B](implicit des: Deserialize[A, B]): Deserialize[A, Validation[Throwable, B]] =
     new Deserialize[A, Validation[Throwable, B]] {
@@ -49,6 +50,19 @@ trait DeserializeFunctions { self =>
     new Deserialize[A, Try[B]] {
       override def deserialize(a: A): Try[B] =
         Try(des.deserialize(a))
+    }
+
+  /**
+   * Converts A into either B or Throwable.  This function will only catch [[NonFatal]] exception
+   */
+  implicit def scalazEitherDeserialize[A, B](implicit des: Deserialize[A, B]): Deserialize[A, Throwable \/ B] =
+    new Deserialize[A, Throwable \/ B] {
+      override def deserialize(a: A): Throwable \/ B =
+        try {
+          \/-(des.deserialize(a))
+        } catch {
+          case NonFatal(t) => -\/(t)
+        }
     }
 }
 

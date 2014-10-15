@@ -13,6 +13,12 @@ trait IOInstances { self =>
   implicit val ByteBufferEqual: Equal[ByteBuffer] =
     Equal.equalA[ByteBuffer]
 
+  /**
+   * Equality is defined by:
+   * if both directories, follow any symlink to verify they go to the same path
+   * if both length's match, verify that all bytes match as well
+   * else false
+   */
   implicit val FileByteEqual: Equal[File] = Equal.equal { (l, r) =>
     // if length doesn't match, why bother?
     if (l.isDirectory && r.isDirectory) {
@@ -20,8 +26,11 @@ trait IOInstances { self =>
       Files.readSymbolicLink(l.toPath) == Files.readSymbolicLink(r.toPath)
     } else if (l.length() == r.length()) {
       def wrap(file: File): InputStream =
-        new BufferedInputStream(new FileInputStream(file))
+        new BufferedInputStream(new FileInputStream(file), BufferSize)
 
+      /**
+       * Expects is to be buffered, or else this would be very slow
+       */
       def buffer(is: InputStream): Iterator[Stream[Byte]] =
         Stream.continually(is.read).takeWhile(_ != -1).map(_.toByte).grouped(BufferSize)
 

@@ -5,6 +5,7 @@ import java.nio.ByteBuffer
 
 import com.gopivotal.sutils.BaseTest
 import com.gopivotal.sutils.syntax.serialize._
+import com.gopivotal.sutils.syntax.std.file._
 import com.gopivotal.sutils.BinarySerialize._
 
 import scalaz.{Equal, \/-, -\/, Show}
