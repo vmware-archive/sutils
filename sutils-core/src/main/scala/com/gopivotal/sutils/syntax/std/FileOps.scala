@@ -60,5 +60,6 @@ final class FileOps(val self: File) extends AnyVal with ToFileOps {
 }
 
 trait ToFileOps extends Any {
+  import scala.language.implicitConversions
   implicit def ToFileOps(file: File): FileOps = new FileOps(file)
 }

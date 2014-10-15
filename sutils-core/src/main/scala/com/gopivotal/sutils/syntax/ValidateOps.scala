@@ -11,5 +11,6 @@ class ValidateOpt[A](val self: A) extends AnyVal {
 }
 
 trait ToValidateOpt {
+  import scala.language.implicitConversions
   implicit def ToValidateOpt[A](a: A): ValidateOpt[A] = new ValidateOpt[A](a)
 }

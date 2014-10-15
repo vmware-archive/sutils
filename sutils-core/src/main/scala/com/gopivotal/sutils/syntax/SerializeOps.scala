@@ -26,5 +26,6 @@ class SerializeOps[A](val a: A) extends AnyVal {
 }
 
 trait ToSerializeOps {
+  import scala.language.implicitConversions
   implicit def ToSerializeOps[A](a: A): SerializeOps[A] = new SerializeOps[A](a)
 }

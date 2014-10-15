@@ -17,6 +17,9 @@
  */
 package com.gopivotal.sutils
 
+import java.nio.ByteBuffer
+import java.nio.charset.Charset
+
 import scala.util.Try
 import scalaz.Validation
 
@@ -42,6 +45,29 @@ trait SerializeTo[C, D] {self =>
   def to(c: C): Unit
 }
 
+trait SerializeInstances { self =>
+  implicit val charSer: Serialize[Char, ByteBuffer] =
+    Serialize.serialize(a => ByteBuffer.allocate(1).putChar(a))
+
+  implicit val byteSer: Serialize[Byte, ByteBuffer] =
+    Serialize.serialize(a => ByteBuffer.allocate(1).put(a))
+
+  implicit val shortSer: Serialize[Short, ByteBuffer] =
+    Serialize.serialize(a => ByteBuffer.allocate(2).putShort(a))
+
+  implicit val intSer: Serialize[Int, ByteBuffer] =
+    Serialize.serialize(a => ByteBuffer.allocate(4).putInt(a))
+
+  implicit val longSer: Serialize[Long, ByteBuffer] =
+    Serialize.serialize(a => ByteBuffer.allocate(8).putLong(a))
+
+  implicit val floatSer: Serialize[Float, ByteBuffer] =
+    Serialize.serialize(a => ByteBuffer.allocate(4).putFloat(a))
+
+  implicit val doubleSer: Serialize[Double, ByteBuffer] =
+    Serialize.serialize(a => ByteBuffer.allocate(8).putDouble(a))
+}
+
 trait SerializeFunctions { self =>
 
   /**
@@ -59,12 +85,21 @@ trait SerializeFunctions { self =>
     new Serialize[A, Try[B]] {
       override def serialize(a: A): Try[B] = Try(ser.serialize(a))
     }
+
+  implicit def stringSer(implicit c: Charset): Serialize[String, Array[Byte]] =
+    Serialize.serialize(_.getBytes(c))
+
+  implicit def byteSerializerToByteBuffer[A](implicit as: Serialize[A, Array[Byte]]): Serialize[A, ByteBuffer] =
+    Serialize.serialize(a => ByteBuffer.wrap(as.serialize(a)))
+
+  implicit def identitySerializer[A]: Serialize[A, A] =
+    Serialize.serialize(identity)
 }
 
 /**
  * Functions and instances for working with Serialize typeclass.  The main usage is to import the functions defined.
  */
-object Serialize extends SerializeFunctions {
+object Serialize extends SerializeFunctions with SerializeInstances {
 
   @inline def apply[A, B](implicit s: Serialize[A, B]): Serialize[A, B] = s
 

@@ -20,33 +20,26 @@ package sutils
 import sbt.Keys._
 import sbt._
 
-object SutilsBuild extends Build {
-
-  // this says it works online, but not seeing it work
-  initialCommands in console := """
-                                  |import com.gopivotal.sutils.serde._
-                                  |import Serialize._
-                                  |import Deserialize._
-                                  |import Format._
-                                  |
-                                  |import com.gopivotal.sutils.validate._
-                                  |import Hibernate.Annotations._
-                                  |import Validate._
-                                """.stripMargin
-
+object build extends Build {
 
   val sharedSettings = Project.defaultSettings ++ Seq(
     organization := "com.gopivotal",
     scalaVersion := "2.10.4",
     version := "0.1.0",
-    crossScalaVersions := Seq("2.10.4", "2.11.1"),
+    crossScalaVersions := Seq("2.10.4", "2.11.2"),
     javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
     javacOptions in doc := Seq("-source", "1.7"),
     parallelExecution in Test := true,
-    scalacOptions ++= Seq(Opts.compile.unchecked, Opts.compile.deprecation, Opts.compile.explaintypes)
+    scalacOptions ++= Seq(
+      Opts.compile.unchecked,
+      Opts.compile.deprecation,
+      Opts.compile.explaintypes,
+      "-feature"
+    )
   )
 
   val scalazVersion = "7.0.6"
+  val scalatestVersion = "2.2.2"
   val jacksonVersion = "2.4.0"
 
   lazy val sutils = Project(
@@ -61,28 +54,27 @@ object SutilsBuild extends Build {
     .dependsOn(core, jacksonSerde, hibernateValidate, examples)
 
   lazy val core = module("core").settings(
-    libraryDependencies += "org.scalaz" % "scalaz-core_2.10" % scalazVersion,
-
-    libraryDependencies += "org.scalatest" % "scalatest_2.10" % "2.2.0" % "test"
+    libraryDependencies += "org.scalaz"                       %% "scalaz-core" % scalazVersion,
+    libraryDependencies += "org.scalatest"                    %% "scalatest" % scalatestVersion % "test"
   )
 
   lazy val jacksonSerde = module("jackson").settings(
-    libraryDependencies += "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion,
-    libraryDependencies += "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion,
+    libraryDependencies += "com.fasterxml.jackson.core"       % "jackson-core" % jacksonVersion,
+    libraryDependencies += "com.fasterxml.jackson.core"       % "jackson-databind" % jacksonVersion,
     libraryDependencies += "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % jacksonVersion,
-    libraryDependencies += "com.fasterxml.jackson.module" % "jackson-module-afterburner" % jacksonVersion,
-    libraryDependencies += "com.fasterxml.jackson.module" % "jackson-module-scala_2.10" % "2.3.3", // upgrade when it releases
+    libraryDependencies += "com.fasterxml.jackson.module"     % "jackson-module-afterburner" % jacksonVersion,
+    libraryDependencies += "com.fasterxml.jackson.module"     % "jackson-module-scala_2.10" % "2.3.3", // upgrade when it releases
 
-    libraryDependencies += "org.scalatest" % "scalatest_2.10" % "2.2.0" % "test",
-    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.2" % "test"
+    libraryDependencies += "org.scalatest"                    %% "scalatest" % scalatestVersion % "test",
+    libraryDependencies += "ch.qos.logback"                   % "logback-classic" % "1.1.2" % "test"
   ).dependsOn(core, core % "test->test")
 
   lazy val hibernateValidate = module("hibernate").settings(
-    libraryDependencies += "org.hibernate" % "hibernate-validator" % "5.0.3.Final",
-    libraryDependencies += "org.glassfish.web" % "javax.el" % "2.2.5",
+    libraryDependencies += "org.hibernate"                    % "hibernate-validator" % "5.0.3.Final",
+    libraryDependencies += "org.glassfish.web"                % "javax.el" % "2.2.5",
 
-    libraryDependencies += "org.scalatest" % "scalatest_2.10" % "2.2.0" % "test",
-    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.2" % "test"
+    libraryDependencies += "org.scalatest"                    %% "scalatest" % scalatestVersion % "test",
+    libraryDependencies += "ch.qos.logback"                   % "logback-classic" % "1.1.2" % "test"
   ).dependsOn(core, core % "test->test")
 
   lazy val examples = module("examples").dependsOn(
@@ -90,7 +82,6 @@ object SutilsBuild extends Build {
     jacksonSerde,
     hibernateValidate
   )
-
 
   def module(name: String) = {
     val id = "sutils-%s".format(name)

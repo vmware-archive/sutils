@@ -17,6 +17,8 @@
  */
 package com.gopivotal
 
+import scala.annotation.tailrec
+
 package object sutils {
 
   /**
@@ -33,4 +35,15 @@ package object sutils {
    * This syntax came from http://eed3si9n.com/scala-the-flying-sandwich-parts.
    */
   type =>?[-A, +B] = PartialFunction[A, B]
+
+  /**
+   * Runs a function until a given precondition is met.
+   *
+   * @return last value that the precondition approved
+   */
+  @tailrec
+  def doWhile[A](fn: () => A)(p: A => Boolean): A = {
+    val x = fn()
+    if (p(x)) doWhile(fn)(p) else x
+  }
 }
