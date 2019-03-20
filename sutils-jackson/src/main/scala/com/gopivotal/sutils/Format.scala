@@ -41,6 +41,6 @@ trait FormatFunctions {
 
 /**
  * Data formats commonly used with serialization.  These work with tag-types, for details on these, go
- * to http://dcapwell.github.io/scala-tour/Tag%20Types.html
+ * to https://dcapwell.github.io/scala-tour/Tag%20Types.html
  */
 object Format extends FormatFunctions

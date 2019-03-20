@@ -38,7 +38,7 @@ json.deserializeValidation[Foo[List[Foo[List[Foo[Int]]]]]]
 // Success(Foo(root,List(Foo(left,null), Foo(right,List(Foo(leaf,1))))))
 ```
 
-The above defaults to using [Jackson](http://jackson.codehaus.org/) for serde operations, but could be switched to anything that defines a implicit function that returns `Serialize[A, B]` (same for deserialze).
+The above defaults to using [Jackson](https://jackson.codehaus.org/) for serde operations, but could be switched to anything that defines a implicit function that returns `Serialize[A, B]` (same for deserialze).
 
 ### validate
 
@@ -136,4 +136,4 @@ import javax.validation.ConstraintViolation
   // Failure(NonEmptyList((Orchestration,version,may not be empty), (Orchestration,module,may not be empty), (Orchestration,roles,may not be empty), (Action,name,may not be empty), (Action,commands,may not be empty), (Action,name,may not be empty), (ServiceCommand,name,may not be empty), (ServiceCommand,args,may not be empty), (ResourceCommand,name,may not be empty), (ResourceCommand,args,may not be empty)))
 ```
 
-This example looks overly complex, but its showing the harder case for validate.  The default implementation uses [Hibernate Validator](http://hibernate.org/validator/) which doesn't support nested validation checks for scala.  If your object needs nested validation, you can follow the code above.  [Scalaz](https://github.com/scalaz/scalaz)'s `Validation` type will make sure all errors join together for the response
+This example looks overly complex, but its showing the harder case for validate.  The default implementation uses [Hibernate Validator](https://hibernate.org/validator/) which doesn't support nested validation checks for scala.  If your object needs nested validation, you can follow the code above.  [Scalaz](https://github.com/scalaz/scalaz)'s `Validation` type will make sure all errors join together for the response
